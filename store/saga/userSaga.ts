@@ -1,11 +1,17 @@
 
-import { getUsersFailure, getUsersRequest, getUsersSuccess } from '../features/userSlice';
+import { userLogin } from '../features/userSlice';
 import { takeLatest } from 'redux-saga/effects';
+import UserSchema from '../../model/UserSchema'
+import { PayloadAction } from "@reduxjs/toolkit";
 
-const loginUser = async () => {
-
+interface loginAction {
+    username: string;
+    password: string
+}
+function* loginUser (action: PayloadAction<loginAction>) : Generator {
+    console.log("action => ", action)
 }
 
 export function* watchUserActions() {
-    return takeLatest(getUsersRequest.type, loginUser)
+    yield takeLatest(userLogin.type, loginUser)
 }

@@ -1,21 +1,94 @@
 'use client';
 
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { useSelector , useDispatch } from "react-redux";
+import React, { useState, useReducer } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import Alert from '@mui/material/Alert';
+import CLoseIcon from '@mui/icons-material/Close';
+import { userLogin } from '../../store/features/userSlice'
 
+const initialErrorState = {
+  error: false,
+  message: "",
+}
+
+const localReducer = (state, action) => {
+  switch (action.type) {
+    case "USERNAME_EMPTY":
+      return {
+        error: true,
+        message: "Username cannot be empty",
+      }
+    case "USERNAME_MOBILE_INVALID":
+      return {
+        error: true,
+        message: "Invalid mobile number format",
+      }
+    case "USERNAME_EMAIL_INVALID":
+      return {
+        error: true,
+        message: "Invalid email format",
+      }
+    case "PASSWORD_EMPTY":
+      return {
+        error: true,
+        message: "Password cannot be empty",
+      }
+    case "PASSWORD_INVALID":
+      return {
+        error: true,
+        message: "Invalid password format",
+      }
+    case "RESET_ERROR":
+      return {
+        error: false,
+        message: "",
+      }
+    default:
+      return state;
+  }
+}
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  
+  const [state, dispatchLocal] = useReducer(localReducer, initialErrorState);
+  const dispatch = useDispatch()
+
   const router = useRouter();
+
+  const handleTypeCred = (setValue, value) => {
+    dispatchLocal({ type: 'RESET_ERROR' })
+    setValue(value);
+  }
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log("Username:", username);
-    console.log("Password:", password);
 
-    // Add your login logic here
+    if (username.trim() === "") {
+      dispatchLocal({ type: "USERNAME_EMPTY" });
+      return;
+    }
+
+    if (password.trim() === "") {
+      dispatchLocal({ type: "PASSWORD_EMPTY" });
+      return;
+    }
+
+    if (/^\d+$/.test(username)) {
+      if (!(/^\d{10}$/.test(username))) {
+        dispatchLocal({ type: "USERNAME_MOBILE_INVALID" });
+        return;
+      }
+    } else {
+      if (!(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username))) {
+        dispatchLocal({ type: "USERNAME_EMAIL_INVALID" });
+        return;
+      }
+    }
+
+    const payload = { username, password }
+
+    dispatch(userLogin(payload))
   };
 
   return (
@@ -29,7 +102,7 @@ const LoginPage = () => {
             type="text"
             placeholder="Email/contact number"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => handleTypeCred(setUsername, e.target.value)}
             style={styles.input}
           />
 
@@ -37,7 +110,7 @@ const LoginPage = () => {
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => handleTypeCred(setPassword, e.target.value)}
             style={styles.input}
           />
 
@@ -50,6 +123,10 @@ const LoginPage = () => {
           </h3>
         </form>
       </div>
+      {state.error && <Alert style={styles.alert} icon={<CLoseIcon fontSize="inherit" />} severity="error">
+        {state.message}
+      </Alert>}
+
     </div>
   );
 };
@@ -99,6 +176,12 @@ const styles = {
     fontSize: "16px",
     cursor: "pointer",
   },
+  alert: {
+    position: "absolute",
+    top: "20px",
+    left: "50%",
+    transform: "translateX(-50%)",
+  }
 };
 
 export default LoginPage;

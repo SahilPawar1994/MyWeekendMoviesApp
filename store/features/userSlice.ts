@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 interface UserSlice {
     firstName: String,
@@ -7,7 +7,7 @@ interface UserSlice {
     password: String;
     loading: Boolean;
     error: object;
-    isLoggedIn: Boolean
+    isLoggedIn: boolean;
 }
 
 const initialState: UserSlice = {
@@ -29,18 +29,33 @@ const userSlice = createSlice({
           state.loading = true;
         },
     
-        getUsersSuccess(state, action: PayloadAction<any[]>) {
+        getUsersSuccess(state, action: PayloadAction<boolean>) {
           state.loading = false;
           state.isLoggedIn = action.payload;
         },
     
-        getUsersFailure(state, action: PayloadAction<string>) {
+        getUsersFailure(state, action: PayloadAction<any>) {
           state.loading = false;
           state.error = action.payload;
         },
+
+        userLogin(state) {
+          state.loading = true
+        },
+
+        userLoginSuccess(state, action: PayloadAction<UserSlice>) {
+          state.loading = false;
+          state.isLoggedIn = action.payload.isLoggedIn;
+        },
+
+         userLoginFailures(state, action: PayloadAction<UserSlice>) {
+          state.loading = false;
+          state.isLoggedIn = action.payload.isLoggedIn;
+          state.error = action.payload;
+        }
       }
 })
 
-export const { getUsersFailure, getUsersSuccess, getUsersRequest} = userSlice.actions;
+export const { getUsersFailure, getUsersSuccess, getUsersRequest, userLogin, userLoginFailures, userLoginSuccess} = userSlice.actions;
 
 export default userSlice.reducer;
