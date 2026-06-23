@@ -8,6 +8,7 @@ interface UserSlice {
     loading: Boolean;
     error: object;
     isLoggedIn: boolean;
+    message: string;
 }
 
 const initialState: UserSlice = {
@@ -21,20 +22,33 @@ const initialState: UserSlice = {
     isLoggedIn: false
 }
 
+interface RegisterUserPayload {
+  isLoggedIn: boolean;
+  message: string;
+  user: object;
+}
+
 const userSlice = createSlice({
     initialState,
     name: 'user',
     reducers: {
-        getUsersRequest(state) {
+        userRegister(state) {
           state.loading = true;
+          state.error = {
+            message: '',
+            error: false
+          };
+
         },
     
-        getUsersSuccess(state, action: PayloadAction<boolean>) {
+        userRegisterSuccess(state, action: PayloadAction<RegisterUserPayload>) {
+          console.log("userRegisterSuccess action => ", action)
           state.loading = false;
-          state.isLoggedIn = action.payload;
+          state.isLoggedIn = action.payload.isLoggedIn;
+          state.message = action.payload.message
         },
     
-        getUsersFailure(state, action: PayloadAction<any>) {
+        userRegisterFailure(state, action: PayloadAction<any>) {
           state.loading = false;
           state.error = action.payload;
         },
@@ -56,6 +70,6 @@ const userSlice = createSlice({
       }
 })
 
-export const { getUsersFailure, getUsersSuccess, getUsersRequest, userLogin, userLoginFailures, userLoginSuccess} = userSlice.actions;
+export const { userRegister, userRegisterFailure, userRegisterSuccess, userLogin, userLoginFailures, userLoginSuccess} = userSlice.actions;
 
 export default userSlice.reducer;

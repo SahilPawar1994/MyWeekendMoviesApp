@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from "next/navigation";
-import React, { useState, useReducer } from "react";
+import React, { useState, useReducer, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Alert from '@mui/material/Alert';
 import CLoseIcon from '@mui/icons-material/Close';
@@ -44,6 +44,11 @@ const localReducer = (state, action) => {
         error: false,
         message: "",
       }
+    case "INVALID_CRED" :
+      return {
+        error: true,
+        message: action.payload.message
+      }
     default:
       return state;
   }
@@ -53,7 +58,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [state, dispatchLocal] = useReducer(localReducer, initialErrorState);
   const dispatch = useDispatch()
-
+  const userState = useSelector(state => state.userReducer);
   const router = useRouter();
 
   const handleTypeCred = (setValue, value) => {
@@ -91,6 +96,14 @@ const LoginPage = () => {
     dispatch(userLogin(payload))
   };
 
+  useEffect(() => {
+    const { error, message } = userState.error
+    if(error) {
+      dispatchLocal({ type: 'INVALID_CRED', payload: {
+        message: message
+      }})
+    }
+  }, [userState.error])
   return (
     <div style={styles.container}>
       <div style={styles.card}>

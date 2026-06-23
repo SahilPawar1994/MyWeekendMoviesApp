@@ -1,35 +1,113 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useReducer, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Alert from '@mui/material/Alert';
+import CLoseIcon from '@mui/icons-material/Close';
+import { useDispatch, useSelector } from "react-redux";
+import { userRegister } from "../../store/features/userSlice";
 
+const localReducer = (state, action) => {
+  const { type, payload } = action;
+  switch (type) {
+    case "REQUIRED_FIELD":
+      return {
+        error: true,
+        message: `${payload.field}: Required Field`
+      }
+    case "RESET_ERROR":
+      return {
+        error: false,
+        message: ``
+      }
+    case 'DUPLICATE_USER':
+      return {
+        error: true,
+        message: payload.message
+      }
+    default:
+      return {
+        error: false,
+        message: ""
+      }
+  }
+};
+
+const initialErrorState = {
+  error: false, message: ''
+}
+
+const initialFormState = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  contact: "",
+  password: "",
+  confirmPassword: "",
+}
 const RegisterPage = () => {
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    contact: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const [form, setForm] = useState(initialFormState);
+  const [state, dispatchLocal] = useReducer(localReducer, initialErrorState);
   const router = useRouter();
+  const dispatch = useDispatch()
+  const { loading, isLoggedIn, error, user } = useSelector(state => state.userReducer)
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm(() => {
+      dispatchLocal("RESET_ERROR")
+      return { ...form, [e.target.name]: e.target.value }
+    })
   };
 
   const handleRegister = (e) => {
     e.preventDefault();
+
+    const emptyStrings = Object.keys(form).filter(
+      key => form[key] === ""
+    );
+
+    if (emptyStrings.length) {
+      dispatchLocal({ type: 'REQUIRED_FIELD', payload: { field: emptyStrings[0] } })
+      return;
+    }
 
     if (form.password !== form.confirmPassword) {
       alert("Passwords do not match");
       return;
     }
 
-    console.log("User Data:", form);
-    // Add API integration here
-    router.push("/dashboard");
+    const payload = {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      contact: form.contact,
+      password: form.password
+    }
+    dispatch({
+      type: userRegister.type,
+      payload: {
+        ...payload
+      }
+    })
   };
+
+  useEffect(() => {
+    if (error.message) {
+      setForm(initialFormState)
+      dispatchLocal({
+        type: 'DUPLICATE_USER',
+        payload: {
+          message: error.message || ''
+        }
+      })
+    }
+  }, [error?.message])
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push('/dashboard')
+    }
+  }, [isLoggedIn])
 
   return (
     <div style={styles.container}>
@@ -97,6 +175,9 @@ const RegisterPage = () => {
           </button>
         </form>
       </div>
+      {state.error && <Alert style={styles.alert} icon={<CLoseIcon fontSize="inherit" />} severity="error">
+        {state.message}
+      </Alert>}
     </div>
   );
 };
@@ -146,6 +227,12 @@ const styles = {
     fontSize: "16px",
     cursor: "pointer",
   },
+  alert: {
+    position: "absolute",
+    top: "20px",
+    left: "50%",
+    transform: "translateX(-50%)",
+  }
 };
 
 export default RegisterPage;

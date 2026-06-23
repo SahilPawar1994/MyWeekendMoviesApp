@@ -9,6 +9,11 @@ const UserSchema = new Schema({
         type: String,
         required: false
     },
+    contact: {
+        type: String,
+        unique: [true, 'Contact Alredy Exists!!!'],
+        required: [true, 'Contact is required!!!']
+    },
     email: {
         type: String,
         unique: [true, 'Email Alredy Exists!!!'],
@@ -20,6 +25,6 @@ const UserSchema = new Schema({
     }
 })
 
-const User = models.User || model('UserSchema', UserSchema)
+const User = models.User || model('User', UserSchema)
 
 export default User;
