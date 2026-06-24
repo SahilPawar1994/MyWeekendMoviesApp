@@ -59,6 +59,7 @@ const LoginPage = () => {
   const [state, dispatchLocal] = useReducer(localReducer, initialErrorState);
   const dispatch = useDispatch()
   const userState = useSelector(state => state.userReducer);
+  const { error: errorObj, isLoggedIn, loading } = userState
   const router = useRouter();
 
   const handleTypeCred = (setValue, value) => {
@@ -97,13 +98,19 @@ const LoginPage = () => {
   };
 
   useEffect(() => {
-    const { error, message } = userState.error
+    const { error, message } = errorObj
     if(error) {
       dispatchLocal({ type: 'INVALID_CRED', payload: {
         message: message
       }})
     }
-  }, [userState.error])
+  }, [errorObj?.message])
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push('/dashboard')
+    }
+  }, [isLoggedIn])
   return (
     <div style={styles.container}>
       <div style={styles.card}>

@@ -17,7 +17,9 @@ const connectToDatabase = async () => {
     // }
 
 
-    await mongoose.connect("mongodb://127.0.0.1:27017/myweekendmovieapp")
+    // mongodb+srv://sahil:<db_password>@cluster1.54zgd.mongodb.net/?appName=cluster1
+    // mongodb://127.0.0.1:27017/myweekendmovieapp
+    await mongoose.connect("mongodb+srv://sahil:user@cluster1.54zgd.mongodb.net/MyWeekendMoviesApp?appName=cluster1")
         .then(() => console.log("✅ Connected to local MongoDB"))
         .catch((err) => console.log("❌ Error:", err));
 

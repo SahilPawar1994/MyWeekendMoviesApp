@@ -55,6 +55,10 @@ const userSlice = createSlice({
 
         userLogin(state) {
           state.loading = true
+          state.error = {
+            message: '',
+            error: false
+          };
         },
 
         userLoginSuccess(state, action: PayloadAction<UserSlice>) {
