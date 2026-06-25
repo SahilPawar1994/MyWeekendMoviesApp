@@ -9,7 +9,7 @@ export const GET = async (request: Request) => {
 
         const entries = Object.fromEntries(searchParams.entries());
         const payload = {
-            [/^\d{10}$/.test(entries.username) ? 'contact' : 'email'] : entries.username,
+            [/^\d{10}$/.test(entries.username) ? 'contact' : 'email']: entries.username,
             password: entries.password
         }
 
@@ -21,7 +21,7 @@ export const GET = async (request: Request) => {
         }, {
             status: 200,
             statusText: 'success',
-            headers: { "Content-Type" : 'application/json'}
+            headers: { "Content-Type": 'application/json' }
         })
 
         const access_token = getAcceToken(data._id);
@@ -36,10 +36,11 @@ export const GET = async (request: Request) => {
         })
         return nextResponse
     } catch (e: any) {
+        console.log("err =>", e)
         return NextResponse.json({
             success: false,
             Message: e?.message || 'User Registration Error!!!'
-        }, { status: 409, statusText: 'failure'})
+        }, { status: 409, statusText: 'failure' })
     }
 }
 
@@ -57,7 +58,7 @@ export const POST = async (request: Request) => {
                 access_token, refresh_token
             },
             success: true,
-            message: 'User Registered Successfully!!!',  
+            message: 'User Registered Successfully!!!',
         }, {
             status: 201,
             headers: { "Content-Type": "application/json" }
