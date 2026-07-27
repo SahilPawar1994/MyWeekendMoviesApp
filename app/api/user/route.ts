@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 import UserSchema from '@/model/UserSchema'
 import { getAcceToken, getRefreshToken } from '@/axios/token'
+import connectToDatabase from '@/config/DatabaseConnection';
 
 export const GET = async (request: Request) => {
     try {
-
+        await connectToDatabase();
         const { searchParams } = new URL(request.url);
 
         const entries = Object.fromEntries(searchParams.entries());
@@ -46,6 +47,8 @@ export const GET = async (request: Request) => {
 
 export const POST = async (request: Request) => {
     try {
+        await connectToDatabase();
+
         const body = await request.json();
 
         const response = await UserSchema.insertOne(body);

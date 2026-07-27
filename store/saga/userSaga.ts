@@ -3,7 +3,8 @@ import {
   userLoginFailures,
   userLoginSuccess,
   userRegister,
-  userRegisterFailure,
+  logoutUser,
+  logoutSuccess,
   userRegisterSuccess,
 } from "../features/userSlice";
 import { call, put, takeLatest } from "redux-saga/effects";
@@ -24,46 +25,43 @@ interface registerAction {
   password: string;
 }
 
+interface logoutUserType {
+  onSuccess: () => void;
+}
+
 function* loginUser(action: PayloadAction<loginAction>): Generator {
 
   try {
     console.log("flow coming here => ", action);
     const config: axiosRequestType = {
-        url: "/user",
-        method: "GET",
-        params: action.payload,
-      };
-      const response = yield call(axiosRequest, config);
-      const { data = {}, status } = response;
+      url: "/user",
+      method: "GET",
+      params: action.payload,
+    };
+    const response = yield call(axiosRequest, config);
+    const { data = {}, status } = response;
 
-      if (status === 200) {
-        yield put({
-          type: userLoginSuccess.type,
-          payload: {
-            isLoggedIn: true,
-            message: data.message,
-            user: data.user,
-          },
-        });
-      }
-    //   if (data === null || undefined) {
-    //     const error = {
-    //       error: true,
-    //       message: "User Credentials are incorrect!",
-    //       isLoggedIn: false,
-    //     };
-    //     yield put({ type: userLoginFailures.type, payload: error });
-    //   }
-  }catch(e) {
+    console.log("data => ", data)
+    if (status === 200) {
+      yield put({
+        type: userLoginSuccess.type,
+        payload: {
+          isLoggedIn: true,
+          message: data.message,
+          ...data.data
+        },
+      });
+    }
+  } catch (e) {
     const error = e as AxiosError<any>;
     const statusCode = error.response?.status;
     if (statusCode === 409) {
       yield put({
         type: userLoginFailures.type,
         payload: {
-            error: true,
-            message: "User Credentials are incorrect!",
-            isLoggedIn: false,
+          error: true,
+          message: "User Credentials are incorrect!",
+          isLoggedIn: false,
         },
       });
     }
@@ -89,7 +87,7 @@ function* userRegisterHandle(action: PayloadAction<registerAction>): Generator {
         payload: {
           isLoggedIn: true,
           message: data.message,
-          user: data.user,
+          _id: data.user._id,
         },
       });
     }
@@ -108,7 +106,31 @@ function* userRegisterHandle(action: PayloadAction<registerAction>): Generator {
   }
 }
 
+function* logoutUserHandler(action: PayloadAction<logoutUserType>): Generator {
+  const { onSuccess } = action.payload
+  try {
+    const config = {
+      method: 'POST',
+      url: '/user/logout'
+    }
+    const response = yield call(axiosRequest, config);
+
+    console.log("logout response => ", response)
+    const { status } = response;
+
+    if (status === 200) {
+      yield put({
+        type: logoutSuccess.type
+      })
+      onSuccess();
+    }
+  } catch (e) {
+    console.log("logout user handler error => ", e)
+  }
+}
+
 export function* watchUserActions() {
   yield takeLatest(userLogin.type, loginUser);
   yield takeLatest(userRegister.type, userRegisterHandle);
+  yield takeLatest(logoutUser.type, logoutUserHandler)
 }

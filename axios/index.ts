@@ -1,11 +1,11 @@
 
 
-import connectToDatabase from "@/config/DatabaseConnection";
-import axios, { AxiosInstance } from "axios";
+import axios, { type AxiosInstance, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
+// import { cookies } from "next/headers";
 
 export interface axiosRequestType {
   url: string;
-  method: string;
+  method: 'get' | 'post' | 'put' | 'patch' | 'delete' | 'POST' | 'GET';
   data?: object;
   params?: object;
   headers?: object
@@ -17,15 +17,27 @@ const axiosInstance: AxiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true
 });
 
+const authURLs = ['/user', '/auth']
 axiosInstance.interceptors.request.use(
-  async (config) => {
-    await connectToDatabase()
-    return config;
+  async (config: InternalAxiosRequestConfig) => {
+    const { url } = config;
+
+    if (url && authURLs.includes(url)) {
+      return config;
+
+    }
+
+    return config; // will remove from here
   },
   (error) => Promise.reject(error)
 );
+
+axiosInstance.interceptors.response.use(async (config: AxiosResponse) => {
+  return config;
+})
 
 export const axiosRequest = async ({ url, method, data, params, headers }: axiosRequestType) => {
 

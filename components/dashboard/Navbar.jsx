@@ -1,17 +1,31 @@
 'use client';
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from '../../store/features/userSlice'
 
 const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
+  const {_id} = useSelector(state => state.userReducer);
+  console.log("id user => ", _id)
   const router = useRouter();
+  const dispatch = useDispatch()
 
   const handleTabClick = useCallback((tab) => {
     setActiveTab(tab);
     router.push(`/dashboard/${tab === "home" ? "" : tab}`);
   }, [router]);
+
+  const handleLogout = useCallback(() => {
+    dispatch({
+      type: logoutUser.type,
+      payload: {
+        onSuccess: () => router.replace('/')
+      }
+    })
+  }, [])
 
   return (
     <div style={styles.navbar}>
@@ -56,13 +70,13 @@ const Navbar = () => {
             <div style={styles.dropdown}>
               <p
                 style={styles.dropdownItem}
-                onClick={() => router.push("/profile")}
+                onClick={() => router.push(`/profile/${_id}`)}
               >
                 Profile Details
               </p>
               <p
                 style={styles.dropdownItem}
-                onClick={() => console.log("Logout")}
+                onClick={handleLogout}
               >
                 Logout
               </p>

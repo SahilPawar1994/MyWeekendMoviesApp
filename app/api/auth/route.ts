@@ -1,3 +1,4 @@
+import connectToDatabase from "@/config/DatabaseConnection";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -5,6 +6,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   console.log("GET /api/test called");
   try {
+    await connectToDatabase();
     const accessToken = (await cookies()).get("access_token");
     const refreshToken = (await cookies()).get("refresh_token");
 
