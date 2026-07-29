@@ -5,14 +5,14 @@ import axios, { type AxiosInstance, type AxiosResponse, type InternalAxiosReques
 
 export interface axiosRequestType {
   url: string;
-  method: 'get' | 'post' | 'put' | 'patch' | 'delete' | 'POST' | 'GET';
+  method: 'get' | 'post' | 'put' | 'patch' | 'delete' | 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH';
   data?: object;
   params?: object;
   headers?: object
 }
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: "http://localhost:3000/api", // ✅ change if needed
+  baseURL: "http://localhost:8080/api", // ✅ change if needed
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

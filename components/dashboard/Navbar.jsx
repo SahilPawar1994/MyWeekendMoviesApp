@@ -8,8 +8,7 @@ import { logoutUser } from '../../store/features/userSlice'
 const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
-  const {_id} = useSelector(state => state.userReducer);
-  console.log("id user => ", _id)
+  const { id } = useSelector(state => state.userReducer);
   const router = useRouter();
   const dispatch = useDispatch()
 
@@ -70,7 +69,7 @@ const Navbar = () => {
             <div style={styles.dropdown}>
               <p
                 style={styles.dropdownItem}
-                onClick={() => router.push(`/profile/${_id}`)}
+                onClick={() => router.push(`/profile/${id}`)}
               >
                 Profile Details
               </p>

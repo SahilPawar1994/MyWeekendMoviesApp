@@ -32,13 +32,14 @@ interface logoutUserType {
 function* loginUser(action: PayloadAction<loginAction>): Generator {
 
   try {
-    console.log("flow coming here => ", action);
     const config: axiosRequestType = {
-      url: "/user",
-      method: "GET",
-      params: action.payload,
+      url: "/login",
+      method: "POST",
+      data: action.payload,
     };
     const response = yield call(axiosRequest, config);
+    console.log("flow coming here response=> ", response);
+
     const { data = {}, status } = response;
 
     console.log("data => ", data)
@@ -48,7 +49,7 @@ function* loginUser(action: PayloadAction<loginAction>): Generator {
         payload: {
           isLoggedIn: true,
           message: data.message,
-          ...data.data
+          ...data.user
         },
       });
     }
@@ -70,7 +71,7 @@ function* loginUser(action: PayloadAction<loginAction>): Generator {
 
 function* userRegisterHandle(action: PayloadAction<registerAction>): Generator {
   const config: axiosRequestType = {
-    url: "/user",
+    url: "/register",
     method: "POST",
     data: action.payload,
   };
@@ -111,7 +112,7 @@ function* logoutUserHandler(action: PayloadAction<logoutUserType>): Generator {
   try {
     const config = {
       method: 'POST',
-      url: '/user/logout'
+      url: '/logout'
     }
     const response = yield call(axiosRequest, config);
 

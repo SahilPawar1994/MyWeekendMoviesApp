@@ -10,7 +10,7 @@ interface UserSlice {
   isLoggedIn: boolean;
   message: string;
   contact: string;
-  _id: string
+  id: string
 }
 
 const initialState: UserSlice = {
@@ -65,12 +65,11 @@ const userSlice = createSlice({
     },
 
     userLoginSuccess(state, action: PayloadAction<UserSlice>) {
-      const {email, _id, contact} = action.payload
+      console.log("action  => ", action)
+      const {id, isLoggedIn} = action.payload
       state.loading = false;
-      state.isLoggedIn = action.payload.isLoggedIn;
-      state.email = email
-      state.contact = contact
-      state._id = _id
+      state.isLoggedIn = isLoggedIn;
+      state.id = id
     },
 
     userLoginFailures(state, action: PayloadAction<UserSlice>) {
