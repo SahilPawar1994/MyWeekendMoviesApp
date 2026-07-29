@@ -1,6 +1,4 @@
-import { axiosRequest, type axiosRequestType } from "@/axios";
-import { AxiosError } from "axios";
-
+import { axiosRequest } from "@/axios";
 interface ProfileInterface {
 
 }
